@@ -27,6 +27,8 @@ target 'RNStarterKit' do
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
   ########
 
+  pod 'RNGestureHandler', :path => '../node_modules/react-native-gesture-handler'
+
 end
 
 # Multiple commands produce error when building with new Xcode build system
