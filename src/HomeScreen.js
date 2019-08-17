@@ -1,8 +1,15 @@
 import React, { Component } from 'react'
-import { Platform, StyleSheet, View, Image, Dimensions, ImageBackground } from 'react-native';
+import {
+    StyleSheet,
+    View,
+    Dimensions,
+    ImageBackground,
+    TouchableWithoutFeedback,
+    Animated
+} from 'react-native';
 import { Text } from 'react-native-ui-kitten'
 import { SafeAreaView } from 'react-navigation'
-import { FlatList } from 'react-native-gesture-handler';
+import { FlatList, TouchableOpacity } from 'react-native-gesture-handler';
 
 const WINDOW_WIDTH = Dimensions.get('window').width
 
@@ -16,25 +23,71 @@ class HomeScreen extends Component {
     state = {
         data: [],
         images: [
-            { title: "Breaking Bad", image: "https://www.thetvdb.com/banners/_cache/fanart/original/81189-1.jpg" },
-            { title: "Breaking Bad", image: "https://www.thetvdb.com/banners/_cache/fanart/original/81189-1.jpg" },
-            { title: "Breaking Bad", image: "https://www.thetvdb.com/banners/_cache/fanart/original/81189-1.jpg" },
-            { title: "Breaking Bad", image: "https://www.thetvdb.com/banners/_cache/fanart/original/81189-1.jpg" },
-            { title: "Breaking Bad", image: "https://www.thetvdb.com/banners/_cache/fanart/original/81189-1.jpg" },
-        ]
+            { title: "Breaking Bad", imageUrl: "https://www.thetvdb.com/banners/_cache/fanart/original/81189-1.jpg" },
+            { title: "Breaking Bad", imageUrl: "https://www.thetvdb.com/banners/_cache/fanart/original/81189-1.jpg" },
+            { title: "Breaking Bad", imageUrl: "https://www.thetvdb.com/banners/_cache/fanart/original/81189-1.jpg" },
+            { title: "Breaking Bad", imageUrl: "https://www.thetvdb.com/banners/_cache/fanart/original/81189-1.jpg" },
+            { title: "Breaking Bad", imageUrl: "https://www.thetvdb.com/banners/_cache/fanart/original/81189-1.jpg" },
+        ],
+        activeImage: null
+    }
+
+    componentWillMount() {
+        this.allImagesRefs = {}
+        this.oldPosition = {}
+        this.position = new Animated.ValueXY()
+        this.dimensions = new Animated.ValueXY()
+    }
+
+
+    _openImage = (index) => {
+        const ref = this.allImagesRefs[index]
+        ref.measure((x, y, width, height, pageX, pageY) => {
+            this.oldPosition.x = pageX
+            this.oldPosition.y = pageY
+            this.oldPosition.width = width
+            this.oldPosition.height = height
+
+            this.position.setValue({
+                x: pageX,
+                y: pageY
+            })
+
+            this.dimensions.setValue({
+                x: width,
+                y: height
+            })
+
+            const img = this.state.images[index]
+            this.setState({
+                activeImage: img
+            })
+        })
     }
 
     _keyExtractor = (item, index) => index.toString()
 
-    _renderItem = ({ item }) => {
-        const { title, image } = item
+    _renderItem = ({ item, index }) => {
+        const { title, imageUrl } = item
 
         return (
-            <ImageBackground source={{ uri: image }} style={styles.largeThumbnail} imageStyle={{ borderRadius: 12 }} >
-                <View style={{ position: 'absolute', bottom: 0 }}>
-                    < Text category="h4" style={styles.titleText}>{title} </Text>
-                </View>
-            </ImageBackground >
+            <TouchableWithoutFeedback
+                onPress={() => this._openImage(index)}
+                key={index}>
+                <Animated.View style={styles.imageContainer}>
+                    <View
+                        ref={imgRef => (this.allImagesRefs[index] = imgRef)}>
+                        <ImageBackground
+                            source={{ uri: imageUrl }}
+                            style={styles.largeThumbnail}
+                            imageStyle={{ borderRadius: 12 }}>
+                            <View style={{ position: 'absolute', bottom: 0 }}>
+                                <Text category="h4" style={styles.titleText}>{title} </Text>
+                            </View>
+                        </ImageBackground >
+                    </View>
+                </Animated.View>
+            </TouchableWithoutFeedback>
         )
     }
 
@@ -49,6 +102,18 @@ class HomeScreen extends Component {
                     renderItem={this._renderItem.bind(this)}
                     keyExtractor={this._keyExtractor.bind(this)}
                 />
+                <View
+                    style={StyleSheet.absoluteFill}
+                    pointerEvents={this.state.activeImage ? 'auto' : 'none'}
+                >
+                    <View style={{ flex: 2 }}>
+                        <Animated.Image
+                            style={{ height: "80%", width: "100%" }}
+                            source={{ uri: this.state.activeImage ? this.state.activeImage.imageUrl : null }}
+                        >
+                        </Animated.Image>
+                    </View>
+                </View>
             </SafeAreaView>
         )
     }
@@ -67,13 +132,15 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         color: 'white'
     },
-    largeThumbnail: {
-        width: WINDOW_WIDTH - 40,
-        height: WINDOW_WIDTH - 40,
+    imageContainer: {
         marginRight: 20,
         marginLeft: 20,
         marginBottom: 40,
         borderRadius: 12,
+    },
+    largeThumbnail: {
+        width: WINDOW_WIDTH - 40,
+        height: WINDOW_WIDTH - 40,
         elevation: 4,
         shadowOffset: { height: 4, width: 4 },
         shadowOpacity: 0.8,
