@@ -5,7 +5,8 @@ import {
     Dimensions,
     ImageBackground,
     TouchableWithoutFeedback,
-    Animated
+    Animated,
+    Image
 } from 'react-native';
 import { Text } from 'react-native-ui-kitten'
 import { SafeAreaView } from 'react-navigation'
@@ -30,7 +31,8 @@ class HomeScreen extends Component {
             { title: "Breaking Bad", imageUrl: "https://www.thetvdb.com/banners/_cache/fanart/original/81189-1.jpg" },
             { title: "Breaking Bad", imageUrl: "https://www.thetvdb.com/banners/_cache/fanart/original/81189-1.jpg" },
         ],
-        activeImage: null
+        activeImage: null,
+        showCloseIcon: false
     }
 
     componentWillMount() {
@@ -39,7 +41,6 @@ class HomeScreen extends Component {
         this.position = new Animated.ValueXY()
         this.dimensions = new Animated.ValueXY()
     }
-
 
     _openImage = (index) => {
         const ref = this.allImagesRefs[index]
@@ -81,7 +82,9 @@ class HomeScreen extends Component {
                             toValue: dHeight,
                             duration: 300
                         })
-                    ]).start()
+                    ]).start(() => {
+                        this.setState({ showCloseIcon: true })
+                    })
                 })
             })
         })
@@ -113,7 +116,46 @@ class HomeScreen extends Component {
         )
     }
 
+    _closeImage = () => {
+        this.setState({ showCloseIcon: false })
+        Animated.parallel([
+            Animated.timing(this.position.x, {
+                toValue: this.oldPosition.x,
+                duration: 300
+            }),
+            Animated.timing(this.position.y, {
+                toValue: this.oldPosition.y,
+                duration: 300
+            }),
+            Animated.timing(this.dimensions.x, {
+                toValue: this.oldPosition.width,
+                duration: 300
+            }),
+            Animated.timing(this.dimensions.y, {
+                toValue: this.oldPosition.height,
+                duration: 300
+            })
+        ]).start(() => {
+            this.setState({ activeImage: null })
+        })
+    }
+
+    _showCloseIcon() {
+        if (this.state.showCloseIcon) {
+            return <TouchableWithoutFeedback
+                onPress={this._closeImage}
+            >
+                <Image
+                    style={styles.closeIcon}
+                    source={require('./img/cancel.png')} />
+            </TouchableWithoutFeedback>
+        } else {
+            return null
+        }
+    }
+
     render() {
+        // These params are manipulated by Animation
         const activeImageStyle = {
             width: this.dimensions.x,
             height: this.dimensions.y,
@@ -123,9 +165,6 @@ class HomeScreen extends Component {
 
         return (
             <SafeAreaView style={styles.container}>
-                <Text category="h4" style={styles.welcome}>Welcome to Home Screen</Text>
-                <Text style={styles.instructions}>To get started, edit App.js</Text>
-
                 <FlatList
                     data={this.state.images}
                     renderItem={this._renderItem.bind(this)}
@@ -136,13 +175,14 @@ class HomeScreen extends Component {
                     pointerEvents={this.state.activeImage ? 'auto' : 'none'}
                 >
                     <View
-                        style={{ flex: 2 }}
+                        style={{ flex: 2, marginBottom: 80 }}
                         ref={view => (this.viewImage = view)}>
                         <Animated.Image
                             style={[{ top: 0, left: 0, height: null, width: null, resizeMode: 'cover' }, activeImageStyle]}
                             source={{ uri: this.state.activeImage ? this.state.activeImage.imageUrl : null }}
                         >
                         </Animated.Image>
+                        {this._showCloseIcon()}
                     </View>
                 </View>
             </SafeAreaView>
@@ -178,14 +218,12 @@ const styles = StyleSheet.create({
         shadowColor: '#424242',
         shadowRadius: 8
     },
-    welcome: {
-        fontSize: 20,
-        textAlign: 'center',
-        margin: 10,
-    },
-    instructions: {
-        textAlign: 'center',
-        color: '#333333',
-        marginBottom: 5,
-    },
+    closeIcon: {
+        position: 'absolute',
+        right: 20,
+        top: 40,
+        height: 32,
+        width: 32,
+        tintColor: 'white'
+    }
 });
