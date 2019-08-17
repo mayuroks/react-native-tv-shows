@@ -62,6 +62,27 @@ class HomeScreen extends Component {
             const img = this.state.images[index]
             this.setState({
                 activeImage: img
+            }, () => {
+                this.viewImage.measure((dx, dy, dWidth, dHeight, dPageX, dPageY) => {
+                    Animated.parallel([
+                        Animated.timing(this.position.x, {
+                            toValue: dPageX,
+                            duration: 300
+                        }),
+                        Animated.timing(this.position.y, {
+                            toValue: dPageY,
+                            duration: 300
+                        }),
+                        Animated.timing(this.dimensions.x, {
+                            toValue: dWidth,
+                            duration: 300
+                        }),
+                        Animated.timing(this.dimensions.y, {
+                            toValue: dHeight,
+                            duration: 300
+                        })
+                    ]).start()
+                })
             })
         })
     }
@@ -114,9 +135,11 @@ class HomeScreen extends Component {
                     style={StyleSheet.absoluteFill}
                     pointerEvents={this.state.activeImage ? 'auto' : 'none'}
                 >
-                    <View style={{ flex: 2 }}>
+                    <View
+                        style={{ flex: 2 }}
+                        ref={view => (this.viewImage = view)}>
                         <Animated.Image
-                            style={[{ top: 0, left: 0, height: WINDOW_HEIGHT - 100, width: WINDOW_WIDTH - 40, resizeMode: 'cover' }, activeImageStyle]}
+                            style={[{ top: 0, left: 0, height: null, width: null, resizeMode: 'cover' }, activeImageStyle]}
                             source={{ uri: this.state.activeImage ? this.state.activeImage.imageUrl : null }}
                         >
                         </Animated.Image>
