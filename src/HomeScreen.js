@@ -12,6 +12,7 @@ import { SafeAreaView } from 'react-navigation'
 import { FlatList, TouchableOpacity } from 'react-native-gesture-handler';
 
 const WINDOW_WIDTH = Dimensions.get('window').width
+const WINDOW_HEIGHT = Dimensions.get('window').height
 
 class HomeScreen extends Component {
 
@@ -92,6 +93,13 @@ class HomeScreen extends Component {
     }
 
     render() {
+        const activeImageStyle = {
+            width: this.dimensions.x,
+            height: this.dimensions.y,
+            left: this.position.x,
+            top: this.position.y
+        }
+
         return (
             <SafeAreaView style={styles.container}>
                 <Text category="h4" style={styles.welcome}>Welcome to Home Screen</Text>
@@ -108,7 +116,7 @@ class HomeScreen extends Component {
                 >
                     <View style={{ flex: 2 }}>
                         <Animated.Image
-                            style={{ height: "80%", width: "100%" }}
+                            style={[{ top: 0, left: 0, height: WINDOW_HEIGHT - 100, width: WINDOW_WIDTH - 40, resizeMode: 'cover' }, activeImageStyle]}
                             source={{ uri: this.state.activeImage ? this.state.activeImage.imageUrl : null }}
                         >
                         </Animated.Image>
