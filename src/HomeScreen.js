@@ -8,9 +8,10 @@ import {
     Animated,
     Image
 } from 'react-native';
+import Modal from 'react-native-modal'
 import { Text } from 'react-native-ui-kitten'
 import { SafeAreaView } from 'react-navigation'
-import { FlatList, TouchableOpacity } from 'react-native-gesture-handler';
+import { FlatList } from 'react-native-gesture-handler';
 
 const WINDOW_WIDTH = Dimensions.get('window').width
 const WINDOW_HEIGHT = Dimensions.get('window').height
@@ -32,7 +33,8 @@ class HomeScreen extends Component {
             { title: "Breaking Bad", imageUrl: "https://www.thetvdb.com/banners/_cache/fanart/original/81189-1.jpg" },
         ],
         activeImage: null,
-        showCloseIcon: false
+        showCloseIcon: false,
+        isModalVisible: false
     }
 
     componentWillMount() {
@@ -40,6 +42,48 @@ class HomeScreen extends Component {
         this.oldPosition = {}
         this.position = new Animated.ValueXY()
         this.dimensions = new Animated.ValueXY()
+    }
+
+    _renderEpisodeItem = ({ item, index }) => {
+        const { title, imageUrl } = item
+
+        return (
+            <View style={{ flexDirection: 'row', marginBottom: 10 }} >
+                <Image style={{ height: 100, width: 100, borderRadius: 12 }} source={{ uri: imageUrl }} />
+                <Text style={{ marginLeft: 20, marginTop: 8 }} category="h6" >{title}</Text>
+
+                <Text
+                    style={{ position: 'absolute', right: 0, marginTop: 12 }}
+                    category="h7" >$9.87</Text>
+            </View>
+        )
+    }
+
+    _showModal() {
+        console.log("modal shown", this.state.isModalVisible);
+
+        return (
+            <View style={{ flex: 1 }}>
+                <Modal
+                    style={{ margin: 0, justifyContent: 'flex-end' }}
+                    isVisible={this.state.isModalVisible}
+                    deviceHeight={WINDOW_HEIGHT / 2}
+                    deviceWidth={WINDOW_WIDTH}
+                >
+                    <View style={{ height: WINDOW_HEIGHT / 1.8, backgroundColor: 'white' }}>
+                        <View style={{ marginLeft: 20, marginRight: 20, marginTop: 20 }}>
+                            <Text style={{ marginBottom: 25 }} category="h4">Season 1 Episodes</Text>
+                            <FlatList
+                                data={this.state.images}
+                                keyExtractor={this._keyExtractor}
+                                renderItem={this._renderEpisodeItem}
+                            />
+                            {this._showCloseIcon()}
+                        </View>
+                    </View>
+                </Modal>
+            </View>
+        )
     }
 
     _openImage = (index) => {
@@ -84,6 +128,7 @@ class HomeScreen extends Component {
                         })
                     ]).start(() => {
                         this.setState({ showCloseIcon: true })
+                        this.setState({ isModalVisible: true })
                     })
                 })
             })
@@ -118,6 +163,7 @@ class HomeScreen extends Component {
 
     _closeImage = () => {
         this.setState({ showCloseIcon: false })
+        this.setState({ isModalVisible: false })
         Animated.parallel([
             Animated.timing(this.position.x, {
                 toValue: this.oldPosition.x,
@@ -182,9 +228,10 @@ class HomeScreen extends Component {
                             source={{ uri: this.state.activeImage ? this.state.activeImage.imageUrl : null }}
                         >
                         </Animated.Image>
-                        {this._showCloseIcon()}
+
                     </View>
                 </View>
+                {this._showModal()}
             </SafeAreaView>
         )
     }
@@ -221,9 +268,9 @@ const styles = StyleSheet.create({
     closeIcon: {
         position: 'absolute',
         right: 20,
-        top: 40,
+        top: 20,
         height: 32,
         width: 32,
-        tintColor: 'white'
+        tintColor: 'red'
     }
 });
