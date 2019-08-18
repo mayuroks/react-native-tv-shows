@@ -54,24 +54,26 @@ class HomeScreen extends Component {
                     style={{ marginLeft: 20, flexDirection: 'column', backgroundColor: 'blue' }}
                 >
                     <Text
-                        style={{ marginTop: 8 }}
+                        style={{ marginTop: 8, }}
                         category="h6"
                     >
                         {title}
                     </Text>
-                    <Text
-                        style={{ marginTop: 8, position: 'absolute', bottom: 8, backgroundColor: 'red' }}
-                        category="h7"
+                    <View
+                        style={{ marginTop: 8, position: 'absolute', bottom: 8, backgroundColor: 'red', flexDirection: 'row' }}
                     >
-                        ⭐  9.3
-                    </Text>
+                        <Image
+                            style={{ height: 14, width: 14, alignSelf: 'center' }}
+                            source={require('./img/star.png')}></Image>
+                        <Text style={{ alignSelf: 'center', marginLeft: 8 }} category="s2">9.3</Text>
+                    </View>
                 </View>
                 <View
                     style={{ flex: 1, backgroundColor: 'grey' }}
                 >
                     <Text
-                        style={{ position: 'absolute', right: 0, marginTop: 16 }}
-                        category="h7">$9.87</Text>
+                        style={{ position: 'absolute', right: 12, marginTop: 16 }}
+                        category="s1">$9.87</Text>
                     <Button
                         status="white"
                         size="tiny"
@@ -95,20 +97,23 @@ class HomeScreen extends Component {
         return (
             <View style={{ flex: 1 }}>
                 <Modal
+                    backdropOpacity={0.2}
                     style={{ margin: 0, justifyContent: 'flex-end' }}
                     isVisible={this.state.isModalVisible}
                     deviceHeight={WINDOW_HEIGHT / 2}
                     deviceWidth={WINDOW_WIDTH}
                 >
-                    <View style={{ height: WINDOW_HEIGHT / 1.8, backgroundColor: 'white' }}>
+                    <View style={{ height: WINDOW_HEIGHT / 1.8, backgroundColor: 'white', borderRadius: 24 }}>
                         <View style={{ marginLeft: 20, marginRight: 20, marginTop: 20 }}>
-                            <Text style={{ marginBottom: 25 }} category="h4">Season 1 Episodes</Text>
+                            <View style={{ flexDirection: 'row', marginBottom: 25, justifyContent: 'space-between' }}>
+                                <Text category="h4">Season 1 Episodes</Text>
+                                {this._showCloseIcon()}
+                            </View>
                             <FlatList
                                 data={this.state.images}
                                 keyExtractor={this._keyExtractor}
                                 renderItem={this._renderEpisodeItem}
                             />
-                            {this._showCloseIcon()}
                         </View>
                     </View>
                 </Modal>
@@ -223,7 +228,7 @@ class HomeScreen extends Component {
             >
                 <Image
                     style={styles.closeIcon}
-                    source={require('./img/cancel.png')} />
+                    source={require('./img/delete-button.png')} />
             </TouchableWithoutFeedback>
         } else {
             return null
@@ -296,11 +301,11 @@ const styles = StyleSheet.create({
         shadowRadius: 8
     },
     closeIcon: {
-        position: 'absolute',
-        right: 20,
-        top: 20,
-        height: 32,
-        width: 32,
-        tintColor: 'red'
+        // position: 'absolute',
+        // right: 0,
+        alignSelf: 'center',
+        height: 24,
+        width: 24,
+        tintColor: '#9E9E9E'
     }
 });
