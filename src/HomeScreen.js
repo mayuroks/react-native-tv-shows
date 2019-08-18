@@ -9,9 +9,10 @@ import {
     Image
 } from 'react-native';
 import Modal from 'react-native-modal'
-import { Text, Button } from 'react-native-ui-kitten'
+import { Text, Button, Toggle } from 'react-native-ui-kitten'
 import { SafeAreaView } from 'react-navigation'
 import { FlatList } from 'react-native-gesture-handler';
+import { stylesGen, LIGHT_THEME, DARK_THEME } from './styles'
 
 const WINDOW_WIDTH = Dimensions.get('window').width
 const WINDOW_HEIGHT = Dimensions.get('window').height
@@ -20,21 +21,30 @@ class HomeScreen extends Component {
 
     constructor(props) {
         super(props)
+
+        // TODO: replace with real data
+        this.state = {
+            data: [],
+            images: [
+                { title: "Breaking Bad", imageUrl: "https://www.thetvdb.com/banners/_cache/fanart/original/81189-1.jpg" },
+                { title: "Breaking Bad", imageUrl: "https://www.thetvdb.com/banners/_cache/fanart/original/81189-1.jpg" },
+                { title: "Breaking Bad", imageUrl: "https://www.thetvdb.com/banners/_cache/fanart/original/81189-1.jpg" },
+                { title: "Breaking Bad", imageUrl: "https://www.thetvdb.com/banners/_cache/fanart/original/81189-1.jpg" },
+                { title: "Breaking Bad", imageUrl: "https://www.thetvdb.com/banners/_cache/fanart/original/81189-1.jpg" },
+            ],
+            activeImage: null,
+            showCloseIcon: false,
+            isModalVisible: false,
+            darkMode: false,
+            styles: stylesGen(LIGHT_THEME)
+        }
     }
 
-    // TODO: replace with real data
-    state = {
-        data: [],
-        images: [
-            { title: "Breaking Bad", imageUrl: "https://www.thetvdb.com/banners/_cache/fanart/original/81189-1.jpg" },
-            { title: "Breaking Bad", imageUrl: "https://www.thetvdb.com/banners/_cache/fanart/original/81189-1.jpg" },
-            { title: "Breaking Bad", imageUrl: "https://www.thetvdb.com/banners/_cache/fanart/original/81189-1.jpg" },
-            { title: "Breaking Bad", imageUrl: "https://www.thetvdb.com/banners/_cache/fanart/original/81189-1.jpg" },
-            { title: "Breaking Bad", imageUrl: "https://www.thetvdb.com/banners/_cache/fanart/original/81189-1.jpg" },
-        ],
-        activeImage: null,
-        showCloseIcon: false,
-        isModalVisible: false
+    _toggleTheme = (dark = false) => {
+        console.log("method called");
+        let theme = dark ? DARK_THEME : LIGHT_THEME
+        let newStyles = stylesGen(theme)
+        this.setState({ styles: newStyles })
     }
 
     componentWillMount() {
@@ -45,43 +55,32 @@ class HomeScreen extends Component {
     }
 
     _renderEpisodeItem = ({ item, index }) => {
+        const { styles } = this.state
         const { title, imageUrl } = item
 
         return (
-            <View style={{ flexDirection: 'row', marginBottom: 10, backgroundColor: 'yellow' }} >
-                <Image style={{ height: 100, width: 100, borderRadius: 12 }} source={{ uri: imageUrl }} />
-                <View
-                    style={{ marginLeft: 20, flexDirection: 'column', backgroundColor: 'blue' }}
-                >
-                    <Text
-                        style={{ marginTop: 8, }}
-                        category="h6"
-                    >
-                        {title}
-                    </Text>
-                    <View
-                        style={{ marginTop: 8, position: 'absolute', bottom: 8, backgroundColor: 'red', flexDirection: 'row' }}
-                    >
+            <View style={{ flexDirection: 'row', marginBottom: 10 }} >
+                <Image style={styles.episodeImage} source={{ uri: imageUrl }} />
+
+                <View style={{ marginLeft: 20, flexDirection: 'column' }}>
+                    <Text style={styles.episodeTitle} category="h6">{title}</Text>
+                    <View style={styles.ratingContainer}>
                         <Image
-                            style={{ height: 14, width: 14, alignSelf: 'center' }}
+                            style={styles.ratingIcon}
                             source={require('./img/star.png')}></Image>
-                        <Text style={{ alignSelf: 'center', marginLeft: 8 }} category="s2">9.3</Text>
+                        <Text style={styles.ratingText} category="s2">9.3</Text>
                     </View>
                 </View>
-                <View
-                    style={{ flex: 1, backgroundColor: 'grey' }}
-                >
-                    <Text
-                        style={{ position: 'absolute', right: 12, marginTop: 16 }}
-                        category="s1">$9.87</Text>
+
+                <View style={{ flex: 1 }}>
+                    <Text style={styles.pricingText} category="s1">$9.87</Text>
                     <Button
                         status="white"
                         size="tiny"
-                        style={{ backgroundColor: '#E0E0E0', borderRadius: 30, position: 'absolute', right: 0, bottom: 0, width: 60 }}
+                        style={styles.playButton}
                         icon={(style) => {
                             return <Image
-                                style={{ height: 16, width: 16 }}
-                                tintColor="#424242"
+                                style={{ height: 12, width: 12 }}
                                 source={require('./img/media-play.png')}></Image>
                         }}
                     >
@@ -92,7 +91,7 @@ class HomeScreen extends Component {
     }
 
     _showModal() {
-        console.log("modal shown", this.state.isModalVisible);
+        const { styles } = this.state
 
         return (
             <View style={{ flex: 1 }}>
@@ -103,16 +102,17 @@ class HomeScreen extends Component {
                     deviceHeight={WINDOW_HEIGHT / 2}
                     deviceWidth={WINDOW_WIDTH}
                 >
-                    <View style={{ height: WINDOW_HEIGHT / 1.8, backgroundColor: 'white', borderRadius: 24 }}>
-                        <View style={{ marginLeft: 20, marginRight: 20, marginTop: 20 }}>
-                            <View style={{ flexDirection: 'row', marginBottom: 25, justifyContent: 'space-between' }}>
-                                <Text category="h4">Season 1 Episodes</Text>
+                    <View style={styles.episodesModal}>
+                        <View style={styles.episodesContainer}>
+                            <View style={styles.episodesHeader}>
+                                <Text style={styles.headerText} category="h4">Season 1</Text>
                                 {this._showCloseIcon()}
                             </View>
                             <FlatList
                                 data={this.state.images}
                                 keyExtractor={this._keyExtractor}
                                 renderItem={this._renderEpisodeItem}
+                                showsVerticalScrollIndicator={false}
                             />
                         </View>
                     </View>
@@ -174,6 +174,7 @@ class HomeScreen extends Component {
 
     _renderItem = ({ item, index }) => {
         const { title, imageUrl } = item
+        const { styles } = this.state
 
         return (
             <TouchableWithoutFeedback
@@ -222,34 +223,51 @@ class HomeScreen extends Component {
     }
 
     _showCloseIcon() {
+        const { styles } = this.state
+
         if (this.state.showCloseIcon) {
-            return <TouchableWithoutFeedback
-                onPress={this._closeImage}
-            >
-                <Image
-                    style={styles.closeIcon}
-                    source={require('./img/delete-button.png')} />
-            </TouchableWithoutFeedback>
+            return (
+                <TouchableWithoutFeedback onPress={this._closeImage}>
+                    <Image
+                        style={styles.closeIcon}
+                        source={require('./img/delete-button.png')} />
+                </TouchableWithoutFeedback>
+            )
         } else {
             return null
         }
     }
 
     render() {
-        // These params are manipulated by Animation
+        // These params are manipulated by Animation Value
         const activeImageStyle = {
             width: this.dimensions.x,
             height: this.dimensions.y,
             left: this.position.x,
             top: this.position.y
         }
+        const { styles } = this.state
 
         return (
             <SafeAreaView style={styles.container}>
+                <View style={styles.header} >
+                    <Text style={styles.headerText} category="h4">Dark mode</Text>
+                    <Toggle
+                        style={{ alignSelf: 'center' }}
+                        status="success"
+                        checked={this.state.darkMode}
+                        onChange={(checked) => {
+                            this.setState({ darkMode: checked })
+                            this._toggleTheme(checked)
+                        }}
+                    >
+                    </Toggle>
+                </View>
                 <FlatList
                     data={this.state.images}
                     renderItem={this._renderItem.bind(this)}
                     keyExtractor={this._keyExtractor.bind(this)}
+                    showsVerticalScrollIndicator={false}
                 />
                 <View
                     style={StyleSheet.absoluteFill}
@@ -259,8 +277,11 @@ class HomeScreen extends Component {
                         style={{ flex: 2, marginBottom: 80 }}
                         ref={view => (this.viewImage = view)}>
                         <Animated.Image
-                            style={[{ top: 0, left: 0, height: null, width: null, resizeMode: 'cover' }, activeImageStyle]}
-                            source={{ uri: this.state.activeImage ? this.state.activeImage.imageUrl : null }}
+                            style={[styles.seriesCardImage, activeImageStyle]}
+                            source={{
+                                uri: this.state.activeImage ?
+                                    this.state.activeImage.imageUrl : null
+                            }}
                         >
                         </Animated.Image>
 
@@ -273,39 +294,3 @@ class HomeScreen extends Component {
 }
 
 export default HomeScreen;
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#F5FCFF',
-    },
-    titleText: {
-        alignSelf: 'flex-start',
-        marginLeft: 20,
-        marginBottom: 10,
-        color: 'white'
-    },
-    imageContainer: {
-        marginRight: 20,
-        marginLeft: 20,
-        marginBottom: 40,
-        borderRadius: 12,
-    },
-    largeThumbnail: {
-        width: WINDOW_WIDTH - 40,
-        height: WINDOW_WIDTH - 40,
-        elevation: 4,
-        shadowOffset: { height: 4, width: 4 },
-        shadowOpacity: 0.8,
-        shadowColor: '#424242',
-        shadowRadius: 8
-    },
-    closeIcon: {
-        // position: 'absolute',
-        // right: 0,
-        alignSelf: 'center',
-        height: 24,
-        width: 24,
-        tintColor: '#9E9E9E'
-    }
-});
