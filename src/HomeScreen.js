@@ -25,6 +25,7 @@ class HomeScreen extends Component {
 
         this.state = {
             data: data,
+            activeSeries: -1,
             activeImage: null,
             showCloseIcon: false,
             isModalVisible: false,
@@ -48,8 +49,9 @@ class HomeScreen extends Component {
     }
 
     _renderEpisodeItem = ({ item, index }) => {
+        console.log("episode item", item);
         const { styles } = this.state
-        const { title, imageUrl } = item
+        const { title, imageUrl, rating, pricing } = item
 
         return (
             <View style={{ flexDirection: 'row', marginBottom: 10 }} >
@@ -61,12 +63,12 @@ class HomeScreen extends Component {
                         <Image
                             style={styles.ratingIcon}
                             source={require('./img/star.png')}></Image>
-                        <Text style={styles.ratingText} category="s2">9.3</Text>
+                        <Text style={styles.ratingText} category="s2">{rating}</Text>
                     </View>
                 </View>
 
                 <View style={{ flex: 1 }}>
-                    <Text style={styles.pricingText} category="s1">$9.87</Text>
+                    <Text style={styles.pricingText} category="s1">{pricing}</Text>
                     <Button
                         status="white"
                         size="tiny"
@@ -85,7 +87,13 @@ class HomeScreen extends Component {
 
     _showModal() {
         const { styles } = this.state
+        const { activeSeries } = this.state
+        // console.log("activeseries", activeSeries);
+        // console.log("activeseries state", this.state);
 
+        // const { episodes } = this.state.data[]
+        const episodes = activeSeries > -1 ? this.state.data[activeSeries].episodes : []
+        console.log("activeseries episodes", episodes);
         return (
             <View style={{ flex: 1 }}>
                 <Modal
@@ -102,7 +110,7 @@ class HomeScreen extends Component {
                                 {this._showCloseIcon()}
                             </View>
                             <FlatList
-                                data={this.state.data}
+                                data={episodes}
                                 keyExtractor={this._keyExtractor}
                                 renderItem={this._renderEpisodeItem}
                                 showsVerticalScrollIndicator={false}
@@ -115,6 +123,7 @@ class HomeScreen extends Component {
     }
 
     _openImage = (index) => {
+        this.setState({ activeSeries: index })
         const ref = this.allImagesRefs[index]
         ref.measure((x, y, width, height, pageX, pageY) => {
             this.oldPosition.x = pageX
@@ -193,6 +202,7 @@ class HomeScreen extends Component {
     _closeImage = () => {
         this.setState({ showCloseIcon: false })
         this.setState({ isModalVisible: false })
+        this.setState({ activeSeries: -1 })
         Animated.parallel([
             Animated.timing(this.position.x, {
                 toValue: this.oldPosition.x,
