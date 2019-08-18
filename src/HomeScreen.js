@@ -9,7 +9,7 @@ import {
     Image
 } from 'react-native';
 import Modal from 'react-native-modal'
-import { Text } from 'react-native-ui-kitten'
+import { Text, Button } from 'react-native-ui-kitten'
 import { SafeAreaView } from 'react-navigation'
 import { FlatList } from 'react-native-gesture-handler';
 
@@ -48,13 +48,43 @@ class HomeScreen extends Component {
         const { title, imageUrl } = item
 
         return (
-            <View style={{ flexDirection: 'row', marginBottom: 10 }} >
+            <View style={{ flexDirection: 'row', marginBottom: 10, backgroundColor: 'yellow' }} >
                 <Image style={{ height: 100, width: 100, borderRadius: 12 }} source={{ uri: imageUrl }} />
-                <Text style={{ marginLeft: 20, marginTop: 8 }} category="h6" >{title}</Text>
-
-                <Text
-                    style={{ position: 'absolute', right: 0, marginTop: 12 }}
-                    category="h7" >$9.87</Text>
+                <View
+                    style={{ marginLeft: 20, flexDirection: 'column', backgroundColor: 'blue' }}
+                >
+                    <Text
+                        style={{ marginTop: 8 }}
+                        category="h6"
+                    >
+                        {title}
+                    </Text>
+                    <Text
+                        style={{ marginTop: 8, position: 'absolute', bottom: 8, backgroundColor: 'red' }}
+                        category="h7"
+                    >
+                        ⭐  9.3
+                    </Text>
+                </View>
+                <View
+                    style={{ flex: 1, backgroundColor: 'grey' }}
+                >
+                    <Text
+                        style={{ position: 'absolute', right: 0, marginTop: 16 }}
+                        category="h7">$9.87</Text>
+                    <Button
+                        status="white"
+                        size="tiny"
+                        style={{ backgroundColor: '#E0E0E0', borderRadius: 30, position: 'absolute', right: 0, bottom: 0, width: 60 }}
+                        icon={(style) => {
+                            return <Image
+                                style={{ height: 16, width: 16 }}
+                                tintColor="#424242"
+                                source={require('./img/media-play.png')}></Image>
+                        }}
+                    >
+                    </Button>
+                </View>
             </View>
         )
     }
