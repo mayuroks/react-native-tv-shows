@@ -13,6 +13,7 @@ import { Text, Button, Toggle } from 'react-native-ui-kitten'
 import { SafeAreaView } from 'react-navigation'
 import { FlatList } from 'react-native-gesture-handler';
 import { stylesGen, LIGHT_THEME, DARK_THEME } from './styles'
+import { data } from './dummyData'
 
 const WINDOW_WIDTH = Dimensions.get('window').width
 const WINDOW_HEIGHT = Dimensions.get('window').height
@@ -22,16 +23,8 @@ class HomeScreen extends Component {
     constructor(props) {
         super(props)
 
-        // TODO: replace with real data
         this.state = {
-            data: [],
-            images: [
-                { title: "Breaking Bad", imageUrl: "https://www.thetvdb.com/banners/_cache/fanart/original/81189-1.jpg" },
-                { title: "Breaking Bad", imageUrl: "https://www.thetvdb.com/banners/_cache/fanart/original/81189-1.jpg" },
-                { title: "Breaking Bad", imageUrl: "https://www.thetvdb.com/banners/_cache/fanart/original/81189-1.jpg" },
-                { title: "Breaking Bad", imageUrl: "https://www.thetvdb.com/banners/_cache/fanart/original/81189-1.jpg" },
-                { title: "Breaking Bad", imageUrl: "https://www.thetvdb.com/banners/_cache/fanart/original/81189-1.jpg" },
-            ],
+            data: data,
             activeImage: null,
             showCloseIcon: false,
             isModalVisible: false,
@@ -109,7 +102,7 @@ class HomeScreen extends Component {
                                 {this._showCloseIcon()}
                             </View>
                             <FlatList
-                                data={this.state.images}
+                                data={this.state.data}
                                 keyExtractor={this._keyExtractor}
                                 renderItem={this._renderEpisodeItem}
                                 showsVerticalScrollIndicator={false}
@@ -139,7 +132,7 @@ class HomeScreen extends Component {
                 y: height
             })
 
-            const img = this.state.images[index]
+            const img = this.state.data[index]
             this.setState({
                 activeImage: img
             }, () => {
@@ -264,7 +257,7 @@ class HomeScreen extends Component {
                     </Toggle>
                 </View>
                 <FlatList
-                    data={this.state.images}
+                    data={this.state.data}
                     renderItem={this._renderItem.bind(this)}
                     keyExtractor={this._keyExtractor.bind(this)}
                     showsVerticalScrollIndicator={false}
