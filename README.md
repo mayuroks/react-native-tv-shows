@@ -1,2 +1,2 @@
-# react-native-starter-kit
-React Native Starter Kit
+# React Native TV Shows(Concept App)
+Experimenting with Animations and Dark mode in React Native
